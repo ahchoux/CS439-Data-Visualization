@@ -13,7 +13,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/ahchoux/CS439-Data-Visualization">
-    <img src="images/bike_logo.jpg" alt="Logo" width="140">
+    <img src="images/bike_logo.jpg" alt="Logo" width="300">
   </a>
 
   <h3 align="center">Chapel Hill Bike Safety Visualization</h3>
