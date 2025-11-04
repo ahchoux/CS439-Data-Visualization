@@ -13,22 +13,13 @@
 <br />
 <div align="center">
   <a href="https://github.com/ahchoux/CS439-Data-Visualization">
-    <img src="images/bike_logo.jpg" alt="Logo" width="80" height="80">
+    <img src="images/bike_logo.jpg" alt="Logo" width="300">
   </a>
 
   <h3 align="center">Chapel Hill Bike Safety Visualization</h3>
 
   <p align="center">
     Interactive visualizations exploring bicycle crash data (2007–2018) in Chapel Hill, NC.
-    <br />
-    <a href="https://github.com/ahchoux/CS439-Data-Visualization"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/ahchoux/CS439-Data-Visualization">View Demo</a>
-    &middot;
-    <a href="https://github.com/CS439-Data-Visualization/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
-    &middot;
-    <a href="https://github.com/CS439-Data-Visualization/bike-safety-viz/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -102,13 +93,13 @@ pip install -r requirements.txt
    git clone https://github.com/ahchoux/CS439-Data-Visualization.git
    ```
 2. Navigate into the project directory (PLACEHOLDER DIR NAME)
-  ```
-  cd bike-safety-viz
-  ```
+   ```
+   cd bike-safety-viz
+   ```
 3. Run the visualization app (PLACEHOLDER FILENAME)
-  ```
-  python main.py
-  ```
+   ```
+   python main.py
+   ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Usage
@@ -117,7 +108,7 @@ pip install -r requirements.txt
 * Use dropdown menus and sliders to filter by attributes such as lighting condition, alcohol involvement, or age group.
 * Hover over map points or bars for detailed crash information.
 
-# Example use cases
+### Example use cases
 
 * Identify intersections with the highest accident density.
 * Examine how time of day and alcohol use affect injury severity.
@@ -148,15 +139,17 @@ We welcome feedback and contributions!
 
 ### Top Contributors:
 <a href="https://github.com/ahchoux/CS439-Data-Visualization/graphs/contributors">
-<img src="https://contrib.rocks/image?repo=CS439-Data-Visualization" alt="contrib.rocks image" />
+<img src="https://contrib.rocks/image?repo=ahchoux/CS439-Data-Visualization" alt="contrib.rocks image" />
 </a>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## License
 
-Distributed under the MIT License.
+Distributed under the MIT License. See LICENSE.txt for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## Contact
 
 Team Members:
@@ -165,6 +158,7 @@ John, Naomi, Dave, Nathan, Husain
 Project Link: [https://github.com/ahchoux/CS439-Data-Visualization](https://github.com/ahchoux/CS439-Data-Visualization)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## Acknowledgments
 
 - [x] Chapel Hill Open Data Portal (Crash Data 2007–2018)
