@@ -162,7 +162,7 @@ Project Link: [https://github.com/ahchoux/CS439-Data-Visualization](https://gith
 ## Acknowledgments
 
 - [x] Chapel Hill Open Data Portal (Crash Data 2007–2018)
-- [x] Purdue University – CS441: Data Visualization
+- [x] Purdue University – CS439: Introduction to Data Visualization
 - [x] Best README Template
 - [x] Matplotlib and GeoPandas for visualization support
 
