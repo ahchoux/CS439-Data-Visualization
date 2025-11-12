@@ -1,0 +1,5 @@
+pandas
+matplotlib
+pyqt6
+geopandas
+kagglehub

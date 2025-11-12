@@ -92,13 +92,17 @@ pip install -r requirements.txt
    ```bash
    git clone https://github.com/ahchoux/CS439-Data-Visualization.git
    ```
-2. Navigate into the project directory (PLACEHOLDER DIR NAME)
+2. Run the visualizations
    ```
-   cd bike-safety-viz
+   python -m scripts.hist  # Windows 
+   python3 -m scripts.hist # Mac/Linux
    ```
-3. Run the visualization app (PLACEHOLDER FILENAME)
+
+   or 
+
    ```
-   python main.py
+   python -m scripts.heatmap  # Windows
+   python3 -m scripts.heatmap # Mac/Linux
    ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
