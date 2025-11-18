@@ -1,2 +1,2 @@
 from .heatmap_app import HeatmapApp
-from .hist_app import HistApp
+from .bar_chart_app import BarChartApp
