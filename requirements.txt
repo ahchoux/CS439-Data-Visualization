@@ -3,3 +3,4 @@ matplotlib
 pyqt6
 geopandas
 kagglehub
+contextily
