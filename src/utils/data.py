@@ -1,14 +1,18 @@
 # functions for loading and manipulating data
 import kagglehub
 import pandas as pd
+import os
 
 def load_bike_crash_data() -> pd.DataFrame:
-    """
-    Downloads the latest version of the bike crash dataset from Kaggle.
-
-    Returns:
-        pd.DataFrame: The loaded bike crash data as a DataFrame.
-    """
     path = kagglehub.dataset_download("adityadesai13/11000-bike-crash-data")
-    df = pd.read_csv(path)
-    return df   
+
+    # Find the first CSV inside the downloaded directory
+    for f in os.listdir(path):
+        if f.endswith(".csv"):
+            csv_path = os.path.join(path, f)
+            break
+    else:
+        raise FileNotFoundError("No CSV file found in downloaded dataset")
+
+    df = pd.read_csv(csv_path)
+    return df
