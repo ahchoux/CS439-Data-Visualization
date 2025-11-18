@@ -42,10 +42,11 @@ if __name__ == "__main__":
     # Example usage
     data = {
         'Time_of_Day': ['Morning', 'Morning', 'Afternoon', 'Evening', 'Evening', 'Evening'],
+        'Weather': ['Sunny', 'Rainy', 'Sunny', 'Cloudy', 'Rainy', 'Sunny'],
         'Severity': ['Low', 'High', 'Medium', 'Low', 'Medium', 'High']
     }
     df = pd.DataFrame(data)
-    groups = ['Time_of_Day']
+    groups = ['Time_of_Day', 'Weather']
     column = 'Severity'
     counts = generate_bar_chart_data(df, groups, column)
     for k,v in counts.items():
