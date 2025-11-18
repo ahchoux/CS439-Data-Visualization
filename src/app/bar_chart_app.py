@@ -1,8 +1,8 @@
-# PyQT6 Class for Histogram Visualization App
+# PyQT6 Class for Bar Chart Visualization App
 from PyQt6.QtWidgets import QMainWindow
 from src.utils import load_bike_crash_data
 
-class HistApp(QMainWindow):
+class BarChartApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Histogram Visualization")
