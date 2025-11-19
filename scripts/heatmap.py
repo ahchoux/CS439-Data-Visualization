@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     # plot_crash_points(gdf_web, basemap_style="street")
     # or show hexbin heatmap
-    plot_crash_hexbin(gdf_web, basemap_style="gray", gridsize=40)
+    plot_crash_hexbin(gdf_web, basemap_style="street", gridsize=40) # gray
 
     import matplotlib.pyplot as plt
     plt.show()

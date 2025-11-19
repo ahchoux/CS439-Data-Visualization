@@ -52,6 +52,12 @@ def plot_crash_hexbin(
         alpha=0.7,
     )
 
+    # fix hexbin stretch
+    xmin, ymin, xmax, ymax = gdf_web.total_bounds
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
+    ax.set_aspect("equal")  
+
     ctx.add_basemap(ax, source=_get_basemap_source(basemap_style))
 
     ax.set_axis_off()
