@@ -62,3 +62,24 @@ def prepare_crash_geodata(
     # reproject to Web Mercator for tile basemaps
     gdf_web = gdf.to_crs(epsg=3857)
     return gdf_web
+
+def filter_data(df: pd.DataFrame, column_name: str, choice: str) -> pd.DataFrame:
+    """
+    Takes a dataframe, a column name to filter, and a choice to filter it on (categorical choice). Returns the filtered dataframe.
+    """
+    df_filtered = df.copy()
+    # Any choice doesn't need to filter
+    yes_no_choices = ["CrashAlcoh", "HitRun"]
+    if choice == "Any":
+        return df_filtered
+
+    # For Columns where the selection is baked into the choice window. Ex:LightCond, BikePos, TraffCntrl, SpeedLimit
+    if column_name not in yes_no_choices:
+        df_filtered = df_filtered[df_filtered[column_name] == choice]
+    # For all columns whose choices are any, yes, no Ex:CrashAlcoh, HitRun
+    elif choice == "Yes":
+        df_filtered = df_filtered[df_filtered[column_name] == "Yes"]
+    elif choice == "No":
+        df_filtered = df_filtered[df_filtered[column_name] == "No"]
+
+    return df_filtered
