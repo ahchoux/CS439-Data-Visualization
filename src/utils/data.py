@@ -50,7 +50,6 @@ def prepare_crash_geodata(
     ]
 
     len_clean = len(df)         # len of df after filtering lat/lon
-    print(len_raw, len_clean)
 
     # create GeoDataFrame in WGS84
     gdf = gpd.GeoDataFrame(
