@@ -36,12 +36,15 @@ def plot_crash_hexbin(
     gdf_web: gpd.GeoDataFrame,
     basemap_style: str = "gray",
     gridsize: int = 40,
-    figsize=(8, 8),
+    ax=None,
 ):
     """Plot a hexbin density heatmap of crashes on an Esri basemap."""
     import numpy as np  # local import if you prefer
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(8, 8))
+    else:
+        fig = ax.figure
     x = gdf_web.geometry.x
     y = gdf_web.geometry.y
 
