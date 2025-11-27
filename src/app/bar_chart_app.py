@@ -6,6 +6,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 import sys
 import pandas as pd
+import matplotlib.ticker as mtick
 
 
 class BarChartApp(QMainWindow):
@@ -167,15 +168,17 @@ class BarChartApp(QMainWindow):
 
         # Plot histogram
 
+        num_filtered = len(df_filtered)
         counts = df_filtered["BikeInjury"].value_counts()
-        ordered_counts = [counts.get(cat, 0) for cat in self.injury_order]
+        ordered_counts = [100 * counts.get(cat, 0) / num_filtered for cat in self.injury_order]
         ax.bar(self.injury_order, ordered_counts)
         ax.set_xticks(range(len(self.injury_order)))
         ax.set_xticklabels(self.injury_order, rotation=25, ha="right", fontsize=8)
 
-        ax.set_title("Bike Injury By Severity")
+        ax.set_title(f"Bike Injury By Severity ({num_filtered} accidents)")
         ax.set_xlabel("Injury Severity")
-        ax.set_ylabel("Count")
+        ax.set_ylabel("Percentage of Accidents")
+        ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.0f%%'))
 
         # Y Ranges Problem
         # TODO
