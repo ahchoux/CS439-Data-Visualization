@@ -192,7 +192,13 @@ class App(QMainWindow):
 
         num_filtered = len(df_filtered)
         counts = df_filtered["BikeInjury"].value_counts()
-        ordered_counts = [100 * counts.get(cat, 0) / num_filtered for cat in self.injury_order]
+        num_filtered = len(df_filtered)
+        counts = df_filtered["BikeInjury"].value_counts()
+
+        if num_filtered == 0:
+            ordered_counts = [0 for _ in self.injury_order]
+        else:
+            ordered_counts = [100 * counts.get(cat, 0) / num_filtered for cat in self.injury_order]
         ax.bar(self.injury_order, ordered_counts)
         ax.set_xticks(range(len(self.injury_order)))
         ax.set_xticklabels(self.injury_order, rotation=25, ha="right", fontsize=8)
