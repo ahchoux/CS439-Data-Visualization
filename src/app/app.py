@@ -14,6 +14,7 @@ class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.df = load_bike_crash_data()
+        self.resize(1400, 850)
 
         # Label
         self.injury_order = ["O: No Injury", "C: Possible Injury", "B: Suspected Minor Injury",
@@ -124,10 +125,20 @@ class App(QMainWindow):
         self.figure_heatmap = Figure(figsize=(12, 8))
         self.canvas_heatmap = FigureCanvasQTAgg(self.figure_heatmap)
 
-        # Horizontal container for both plots
+        # Horizontal container for both plots and a key-takeaways section
         plots_row = QHBoxLayout()
+        plots_col = QVBoxLayout()
+        self.info_box = QLabel("")
+        self.info_box.setStyleSheet("""
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        """)
+        plots_col.addWidget(self.canvas_heatmap, stretch=4)
+        plots_col.addWidget(self.info_box, stretch=1)
+        
         plots_row.addWidget(self.canvas_hist, stretch=1)
-        plots_row.addWidget(self.canvas_heatmap, stretch=2)
+        plots_row.addLayout(plots_col, stretch=2)
 
         layout.addLayout(plots_row, stretch=1)
         layout.addLayout(filter_row, stretch=0)
@@ -211,15 +222,67 @@ class App(QMainWindow):
         ax.set_xticks(range(len(self.injury_order)))
         ax.set_xticklabels([self.pretty_injury_labels[label] for label in self.injury_order], rotation=25, ha="right", fontsize=8)
 
-        ax.set_title(f"Bike Injury By Severity ({num_filtered} accidents)")
+        ax.set_title(f"Bike Injury By Severity")
         ax.set_xlabel("Injury Severity")
         ax.set_ylabel("Percentage of Accidents")
         ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.0f%%'))
 
         # shift hist up a to avoid cutting off category labels
-        self.figure_hist.subplots_adjust(bottom=0.2)
+        self.figure_hist.subplots_adjust(left=0.2, bottom=0.2)
         
         self.canvas_hist.draw()
+        
+        # Update Info Box
+        most_common_biker_age_group = self._get_most_common_category(df_filtered, 'BikeAgeGrp')
+        most_common_driver_age_group = self._get_most_common_category(df_filtered, 'DrvrAgeGrp')
+        most_common_biker_direction = self._get_most_common_category(df_filtered, 'BikeDir')
+        most_common_crash_loc = self._get_most_common_category(df_filtered, 'CrashLoc')
+        most_common_scenario = self._get_most_common_category(df_filtered, 'CrashGrp')
+        most_common_vehicle_type = self._get_most_common_category(df_filtered, 'DrvrVehTyp')
+        driver_alcohol_rate = df_filtered['DrvrAlcFlg'].value_counts(normalize=True).get('Yes', 0) * 100 if not df_filtered.empty else 0
+        hit_and_run_rate = df_filtered['HitRun'].value_counts(normalize=True).get('Yes', 0) * 100 if not df_filtered.empty else 0
+        info_text = f"""
+<b>Additional Filtered Info: ({len(df_filtered):,} accidents)</b><br>
+<table style="border-spacing: 50px 5px; text-align: left;">
+<tr>
+<td> <u>Most Common Biker Age Group</u>: {most_common_biker_age_group}</td>
+<td> <u>Most Common Crash Location</u>: {most_common_crash_loc}</td>
+</tr>
+<tr>
+<td> <u>Most Common Driver Age Group</u>: {most_common_driver_age_group}</td>
+<td> <u>Most Common Crash Scenario</u>: {most_common_scenario}</td>
+</tr>
+<tr>
+<td> <u>Most Common Biker Direction</u>: {most_common_biker_direction}</td>
+<td> <u>Most Common Vehicle Type Involved</u>: {most_common_vehicle_type}</td>
+</tr>
+<tr>
+<td> <u>Driver Alcohol Involvement Rate</u>: {driver_alcohol_rate:.1f}%</td>
+<td> <u>Hit and Run Rate</u>: {hit_and_run_rate:.1f}%</td>
+<td></td>
+</tr>
+</table>
+        """
+        self.info_box.setText(info_text)
+    
+    def _get_avg(self, df: pd.DataFrame, column: str) -> str:
+        if df.empty:
+            return "N/A"
+        avg_value = df[column].str.replace(r'\D', '', regex=True).astype(int).mean()
+        if pd.isna(avg_value):
+            return "N/A"
+        return f"{avg_value:.1f}"
+    
+    def _get_most_common_category(self, df: pd.DataFrame, column: str) -> str:
+        if df.empty:
+            return "N/A"
+        mode_series = df[column].mode()
+        if mode_series.empty:
+            return "N/A"
+        
+        cat = mode_series.iloc[0]
+        percentage = (df[column] == cat).sum() * 100 / len(df)
+        return f"{cat} ({percentage:.1f}%)"
 
 #TESTING
 if __name__ == "__main__":
