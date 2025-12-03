@@ -50,10 +50,10 @@ Bike safety is a major concern in many urban areas where cars and bicycles share
 We designed an application that leverages two **interactive visualizations** to help users explore this data intuitively and identify risk patterns:
 
 1. **Geospatial Heatmap**  
-   A heatmap showing crash frequencies across Chapel Hill. Users can filter by features such as lighting condition, alcohol use, and time of day to examine when and where accidents occur most often.
+   A heatmap showing crash frequencies across Chapel Hill.
 
 2. **Grouped Histogram**  
-   A histogram displaying the distribution of crash injury severity. Users can filter or group by demographic variables (e.g., age, sex) or behavioral/environmental conditions (e.g., alcohol use, direction of travel) to uncover deeper patterns.
+   A histogram displaying the distribution of crash injury severity. 
 
 Users can filter features such as "Time of Day", "Alcohol Involvement", "Traffic Control", etc. to evaluate their own commute. Our visualization tool aims to **inform cyclists, policymakers, and the public** about high-risk conditions and encourage safer commuting practices.
 
