@@ -47,7 +47,7 @@
 ### Overview  
 Bike safety is a major concern in many urban areas where cars and bicycles share the road. Our project visualizes **bicycle crash data from 2007–2018 in Chapel Hill, North Carolina**, with the goal of understanding how environmental, demographic, and behavioral factors contribute to crash severity and frequency.
 
-We designed two **interactive visualizations** to help users explore this data intuitively and identify risk patterns:
+We designed an application that leverages two **interactive visualizations** to help users explore this data intuitively and identify risk patterns:
 
 1. **Geospatial Heatmap**  
    A heatmap showing crash frequencies across Chapel Hill. Users can filter by features such as lighting condition, alcohol use, and time of day to examine when and where accidents occur most often.
@@ -55,7 +55,7 @@ We designed two **interactive visualizations** to help users explore this data i
 2. **Grouped Histogram**  
    A histogram displaying the distribution of crash injury severity. Users can filter or group by demographic variables (e.g., age, sex) or behavioral/environmental conditions (e.g., alcohol use, direction of travel) to uncover deeper patterns.
 
-Together, these visualizations aim to **inform cyclists, policymakers, and the public** about high-risk conditions and encourage safer commuting practices.
+Users can filter features such as "Time of Day", "Alcohol Involvement", "Traffic Control", etc. to evaluate their own commute. Our visualization tool aims to **inform cyclists, policymakers, and the public** about high-risk conditions and encourage safer commuting practices.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -75,8 +75,6 @@ Together, these visualizations aim to **inform cyclists, policymakers, and the p
 
 ## Getting Started
 
-To get a local copy up and running, follow these steps.
-
 ### Prerequisites
 
 Make sure you have **Python 3.9+** installed.
@@ -94,39 +92,32 @@ pip install -r requirements.txt
    ```
 2. Run the visualizations
    ```
-   python -m scripts.hist  # Windows 
-   python3 -m scripts.hist # Mac/Linux
-   ```
-
-   or 
-
-   ```
-   python -m scripts.heatmap  # Windows
-   python3 -m scripts.heatmap # Mac/Linux
+   python -m scripts.main  # Windows 
+   python3 -m scripts.main # Mac/Linux
    ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Usage
 
 * Launch the app to explore crash data interactively.
-* Use dropdown menus and sliders to filter by attributes such as lighting condition, alcohol involvement, or age group.
+* Use dropdown menus and sliders to filter by available attributes.
 * Hover over map points or bars for detailed crash information.
 
 ### Example use cases
 
-* Identify intersections with the highest accident density.
-* Examine how time of day and alcohol use affect injury severity.
-* Compare crash frequency by age or gender groups.
+* Identify what traffic accident scenarios are the most likely under different conditions.
+* Examine how alcohol use and lighting conditions affect injury severity.
+* Compare crash frequency by time of day or year.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Roadmap
 
-- [ ] Load and preprocess Chapel Hill crash dataset
-- [ ] Implement geospatial heatmap visualization
-- [ ] Implement grouped histogram visualization
-- [ ] Add tooltip interactivity
-- [ ] Integrate filtering by environmental and demographic factors
+- [x] Load and preprocess Chapel Hill crash dataset
+- [x] Implement geospatial heatmap visualization
+- [x] Implement barchart visualization
+- [x] Add tooltip interactivity
+- [x] Integrate filtering by environmental and demographic factors
 
 See the [open issues](https://github.com/ahchoux/CS439-Data-Visualization/issues) for more details or future enhancements.
 
