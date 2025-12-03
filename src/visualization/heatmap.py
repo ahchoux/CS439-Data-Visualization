@@ -93,7 +93,7 @@ def plot_crash_hexbin(
         y,
         gridsize=gridsize,
         mincnt=1,
-        alpha=0.7,
+        alpha=0.4,
         extent=(xmin, xmax, ymin, ymax),
     )
 
@@ -115,9 +115,15 @@ def plot_crash_hexbin(
     ax.get_yaxis().set_visible(False)
 
     ax.set_title("Bike Crash Density – Chapel Hill", fontsize=14)
-    cb = fig.colorbar(hb, ax=ax, label="Crash Count")
+    cb = fig.colorbar(
+        hb,
+        ax=ax,
+        orientation="horizontal",
+        label="Crash Count",
+        pad=0.02,
+    )
 
-    fig.subplots_adjust(left=0.01, right=0.90, top=0.90, bottom=0.01)
+    fig.subplots_adjust(left=0.02, right=0.98, top=1, bottom=0.15)
 
     # Tooltip is slightly heuristic. Maps points to nearest hex centers.
     centers = hb.get_offsets()
@@ -155,6 +161,15 @@ def plot_crash_hexbin(
             annot.set_visible(False)
             return
 
+        # Flip tooltip to avoid going off-screen
+        midpoint = (xmin + xmax) / 2
+        if cx > midpoint:
+            annot.set_ha("right")
+            annot.set_position((-20, 20))
+        else:
+            annot.set_ha("left")
+            annot.xytext = (20, 20)
+            annot.set_position((20, 20))
 
         text = "Crash Severity Counts:\n" + "\n".join(
             f"{k}: {v}" for k, v in sev_counts.items()
