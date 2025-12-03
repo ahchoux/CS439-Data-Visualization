@@ -42,7 +42,7 @@
 
 ## About The Project
 
-<!-- [![Product Screenshot][product-screenshot]](https://example.com) --> add img of product later
+<img width="2790" height="1742" alt="image" src="https://github.com/user-attachments/assets/976f7490-b482-41ec-a195-7d2d36fd0883" />
 
 ### Overview  
 Bike safety is a major concern in many urban areas where cars and bicycles share the road. Our project visualizes **bicycle crash data from 2007–2018 in Chapel Hill, North Carolina**, with the goal of understanding how environmental, demographic, and behavioral factors contribute to crash severity and frequency.
