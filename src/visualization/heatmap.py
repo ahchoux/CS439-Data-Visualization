@@ -120,10 +120,11 @@ def plot_crash_hexbin(
         ax=ax,
         orientation="horizontal",
         label="Crash Count",
-        pad=0.02,
+        pad=0.05,
+        shrink=0.95
     )
 
-    fig.subplots_adjust(left=0.02, right=0.98, top=1, bottom=0.15)
+    fig.subplots_adjust(left=0.005, right=0.995, top=1, bottom=0.1)
 
     # Tooltip is slightly heuristic. Maps points to nearest hex centers.
     centers = hb.get_offsets()
