@@ -4,3 +4,4 @@ pyqt6
 geopandas
 kagglehub
 contextily
+scipy
