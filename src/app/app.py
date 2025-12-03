@@ -18,6 +18,14 @@ class App(QMainWindow):
         # Label
         self.injury_order = ["O: No Injury", "C: Possible Injury", "B: Suspected Minor Injury",
                              "A: Suspected Serious Injury", "K: Killed", "Unknown Injury"]
+        self.pretty_injury_labels = {
+            "O: No Injury": "No Injury",
+            "C: Possible Injury": "Possible Injury",
+            "B: Suspected Minor Injury": "Suspected Minor Injury",
+            "A: Suspected Serious Injury": "Suspected Serious Injury",
+            "K: Killed": "Killed",
+            "Unknown Injury": "Unknown Injury"
+        }
         self.months = ["Any", "January", "February", "March", "April", "May", "June", "July",
                        "August", "September", "October", "November", "December"]
 
@@ -201,12 +209,15 @@ class App(QMainWindow):
             ordered_counts = [100 * counts.get(cat, 0) / num_filtered for cat in self.injury_order]
         ax.bar(self.injury_order, ordered_counts)
         ax.set_xticks(range(len(self.injury_order)))
-        ax.set_xticklabels(self.injury_order, rotation=25, ha="right", fontsize=8)
+        ax.set_xticklabels([self.pretty_injury_labels[label] for label in self.injury_order], rotation=25, ha="right", fontsize=8)
 
         ax.set_title(f"Bike Injury By Severity ({num_filtered} accidents)")
         ax.set_xlabel("Injury Severity")
         ax.set_ylabel("Percentage of Accidents")
         ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.0f%%'))
+
+        # shift hist up a to avoid cutting off category labels
+        self.figure_hist.subplots_adjust(bottom=0.2)
         
         self.canvas_hist.draw()
 
