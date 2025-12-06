@@ -2,12 +2,14 @@
 
 import matplotlib.pyplot as plt
 from matplotlib import transforms
+from matplotlib.animation import FuncAnimation
 import contextily as ctx
 import geopandas as gpd
 import numpy as np
+import pandas as pd
 from src.utils import load_bike_crash_data, prepare_crash_geodata
 
-# Get global sizes for map, so map does not change when changing filters
+# get global sizes for map, so map does not change when changing filters
 _df_all = load_bike_crash_data()
 _gdf_all = prepare_crash_geodata(_df_all)
 FULL_BOUNDS = _gdf_all.total_bounds
@@ -64,7 +66,6 @@ def plot_crash_hexbin(
     x = gdf_web.geometry.x
     y = gdf_web.geometry.y
 
-    # Empty filtered dataset --------------------------------
     if gdf_web.empty or gdf_web.geometry.is_empty.all():
         xmin, ymin, xmax, ymax = FULL_BOUNDS
         ax.set_xlim(xmin, xmax)
@@ -83,7 +84,6 @@ def plot_crash_hexbin(
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
         return fig, ax
-    # ---------------------------------------------------------------
 
     xmin, ymin, xmax, ymax = FULL_BOUNDS
 
@@ -97,7 +97,6 @@ def plot_crash_hexbin(
         extent=(xmin, xmax, ymin, ymax),
     )
 
-    # fix hexbin stretch
     ax.set_xlim(xmin, xmax)
     ax.set_ylim(ymin, ymax)
     ax.set_aspect("equal")
@@ -200,4 +199,163 @@ def plot_crash_hexbin(
     fig.canvas.mpl_connect("motion_notify_event", hover)
 
     return fig, ax
+
+
+def animate_crash_density_over_time(
+    df: pd.DataFrame = None,
+    basemap_style: str = "gray",
+    gridsize: int = 40,
+    year_col: str = "CrashYear",
+    interval: int = 1000,
+    figsize=(10, 10),
+    save_path: str = None,
+):
+
+    df = load_bike_crash_data()
+    df = df[df[year_col].notna()].copy()
+    
+    years = sorted(df[year_col].unique())
+    years = [int(y) for y in years if pd.notna(y)]
+
+    # prepare GeoDataFrame for all data to get consistent bounds
+    gdf_all = prepare_crash_geodata(df)
+    xmin, ymin, xmax, ymax = gdf_all.total_bounds
+    
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
+    ax.set_aspect("equal")
+    ax.set_frame_on(False)
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+    
+    # store data by year
+    gdf_by_year = {}
+    for year in years:
+        df_year = df[df[year_col] == year].copy()
+        if len(df_year) > 0:
+            gdf_year = prepare_crash_geodata(df_year)
+            gdf_by_year[year] = gdf_year
+            print(f"Year {year}: {len(gdf_year)} crashes with valid coordinates")
+        else:
+            gdf_by_year[year] = gpd.GeoDataFrame(geometry=[], crs="EPSG:3857")
+            print(f"Year {year}: 0 crashes")
+    
+    # initialize empty hexbin and colorbar
+    hb = None
+    cb = None
+    
+    basemap_source = _get_basemap_source(basemap_style)
+    
+    def animate(frame):
+        """Update function for animation"""
+        nonlocal hb, cb
+        
+        year = years[frame]
+        
+        if cb is not None:
+            try:
+                cb.remove()
+            except (AttributeError, ValueError):
+                pass  # colorbar already removed or doesn't exist
+        
+        ax.clear()
+        ax.set_xlim(xmin, xmax)
+        ax.set_ylim(ymin, ymax)
+        ax.set_aspect("equal")
+        ax.set_frame_on(False)
+        ax.get_xaxis().set_visible(False)
+        ax.get_yaxis().set_visible(False)
+        
+        # add basemap
+        ctx.add_basemap(ax, source=basemap_source, crs="EPSG:3857", zorder=0)
+        
+        # remove contextily text
+        for t in list(ax.texts):
+            if t.get_text() == "" or "contextily" in str(t).lower():
+                t.remove()
+        
+        # data for this year
+        gdf_year = gdf_by_year[year]
+        
+        title_text = ax.text(
+            0.5, 0.95,
+            f"Bike Crash Density - Year {year}\n({len(gdf_year)} crashes)",
+            transform=ax.transAxes,
+            ha="center",
+            fontsize=16,
+            weight="bold",
+            bbox=dict(boxstyle="round,pad=0.5", facecolor="white", alpha=0.8),
+            zorder=100
+        )
+        
+        # plot hexbin for this year
+        if not gdf_year.empty and not gdf_year.geometry.is_empty.all():
+            x = gdf_year.geometry.x
+            y = gdf_year.geometry.y
+            
+            hb = ax.hexbin(
+                x,
+                y,
+                gridsize=gridsize,
+                mincnt=1,
+                alpha=0.6,
+                extent=(xmin, xmax, ymin, ymax),
+                cmap="YlOrRd",  # Yellow-Orange-Red colormap
+                zorder=10
+            )
+            
+            # add colorbar
+            cb = fig.colorbar(
+                hb,
+                ax=ax,
+                orientation="horizontal",
+                label="Crash Count",
+                pad=0.05,
+                shrink=0.95
+            )
+        else:
+            # no data for this year - create empty hexbin to maintain structure
+            hb = ax.hexbin(
+                [],
+                [],
+                gridsize=gridsize,
+                mincnt=1,
+                alpha=0.6,
+                extent=(xmin, xmax, ymin, ymax),
+                cmap="YlOrRd",
+                zorder=10
+            )
+            cb = fig.colorbar(
+                hb,
+                ax=ax,
+                orientation="horizontal",
+                label="Crash Count",
+                pad=0.05,
+                shrink=0.95
+            )
+        
+        fig.subplots_adjust(left=0.005, right=0.995, top=0.95, bottom=0.1)
+        fig.canvas.draw_idle()
+        
+        return hb, title_text
+    
+    animate(0)
+    
+    anim = FuncAnimation(
+        fig,
+        animate,
+        frames=len(years),
+        interval=interval,
+        repeat=True,
+        blit=False  # blit=False because we're removing/adding elements
+    )
+    
+    # save animation if path flagged
+    if save_path:
+        print(f"Saving animation to {save_path}...")
+        anim.save(save_path, writer="pillow", fps=1)
+        print("Animation saved!")
+    
+    return fig, anim
 
