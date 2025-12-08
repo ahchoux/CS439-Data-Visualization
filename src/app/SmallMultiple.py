@@ -21,7 +21,7 @@ class SmallMultiplesApp(QMainWindow):
         self.setGeometry(100, 100, 1200, 800)
 
         self.df = load_bike_crash_data()
-        self.cetegories = ['LightCond', 'TraffCntrl', 'CrashGrp']  # categories user can choose
+        self.cetegories = ['LightCond', 'TraffCntrl', 'CrashGrp']
         self.injury_order = ["O: No Injury", "C: Possible Injury", "B: Suspected Minor Injury",
                              "A: Suspected Serious Injury", "K: Killed", "Unknown Injury"]
 
@@ -45,8 +45,9 @@ class SmallMultiplesApp(QMainWindow):
         self.update_plot(self.cetegories[0])
 
     def update_plot(self, category):
-        self.fig.clf()  # clear previous plots
+        self.fig.clf()
 
+        #Category filtering
         categories = self.df[category].dropna().unique()
         categories = [c for c in categories if c != "Unknown"]
         categories = [c for c in categories if c != "Other"]
@@ -54,11 +55,17 @@ class SmallMultiplesApp(QMainWindow):
         categories = sorted(categories)
 
         n_rows = len(categories)
-        self.axs = self.fig.subplots(n_rows, 1, sharex=True)  # one subplot per category
+        self.axs = self.fig.subplots(n_rows, 1, sharex=True)
         if n_rows == 1:
             self.axs = [self.axs]
 
-        colors = plt.cm.Dark2.colors
+        # Red Color
+        cmap = self.adjusted_colormap(cm.YlOrRd, 0.3)
+        norm = mcolors.Normalize(vmin=0, vmax=len(self.injury_order) - 1)
+        colors = [cmap(norm(i)) for i in range(len(self.injury_order))]
+
+        # Categorical colors
+        # colors = plt.cm.Dark2.colors
 
         for i, cat_val in enumerate(categories):
             ax = self.axs[i]
@@ -73,6 +80,13 @@ class SmallMultiplesApp(QMainWindow):
         self.axs[-1].set_xlabel("Crash Severity")
         self.fig.tight_layout()
         self.canvas.draw()
+
+    def adjusted_colormap(self, cmap, minval=0, maxval=1.0, n=100):
+        new_cmap = mcolors.LinearSegmentedColormap.from_list(
+            f'trunc({cmap.name},{minval:.2f},{maxval:.2f})',
+            cmap(np.linspace(minval, maxval, n))
+        )
+        return new_cmap
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
