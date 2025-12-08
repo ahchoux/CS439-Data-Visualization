@@ -35,19 +35,6 @@ BAD_VALUES = {"nan", "NaN", "", " ", "NONE", "None", "UNKNOWN", "Missing"}
 
 
 def plot_severity_matrix(df, ax=None, row_var="RdSurface", col_var="SpeedLimit"):
-    """
-    Draws a matrix of bar charts showing injury severity counts
-    for each combination of road surface and speed limit category.
-    
-    All cells in the same row share the same y-axis scale, so that
-    the same count appears at the same height across all cells in that row.
-
-    This version:
-    - Enforces a strict whitelist of valid RdSurface values
-    - Removes all NaN/invalid/garbage categories
-    - Guarantees no unlabeled rows appear
-    - Uses counts (not proportions) with row-wise normalized scales
-    """
 
     if ax is None:
         fig, ax = plt.subplots()
