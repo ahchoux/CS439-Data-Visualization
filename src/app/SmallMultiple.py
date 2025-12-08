@@ -21,7 +21,7 @@ class SmallMultiplesApp(QMainWindow):
         self.setGeometry(100, 100, 1200, 800)
 
         self.df = load_bike_crash_data()
-        self.cetegories = ['LightCond', 'TraffCntrl', 'CrashGrp']
+        self.cetegories = ['LightCond', 'SpeedLimit', 'BikeSex', 'RuralUrban', "BikeAlcFlg"]
         self.injury_order = ["O: No Injury", "C: Possible Injury", "B: Suspected Minor Injury",
                              "A: Suspected Serious Injury", "K: Killed", "Unknown Injury"]
 
@@ -52,6 +52,8 @@ class SmallMultiplesApp(QMainWindow):
         categories = [c for c in categories if c != "Unknown"]
         categories = [c for c in categories if c != "Other"]
         categories = [c for c in categories if c != "Dark - Unknown Lighting"]
+        categories = [c for c in categories if c != "Missing"]
+        categories = [c for c in categories if c != "."]
         categories = sorted(categories)
 
         n_rows = len(categories)
