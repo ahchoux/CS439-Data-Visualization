@@ -5,3 +5,4 @@ geopandas
 kagglehub
 contextily
 scipy
+superqt

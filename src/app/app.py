@@ -1,4 +1,5 @@
 # PyQT6 Class for Bar Chart Visualization App
+import matplotlib.pyplot as plt
 from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QVBoxLayout, QComboBox, QLabel, QHBoxLayout, QSlider
 from src.utils import load_bike_crash_data, filter_data, prepare_crash_geodata
 from src.visualization.heatmap import plot_crash_hexbin
@@ -8,7 +9,10 @@ from matplotlib.figure import Figure
 import sys
 import pandas as pd
 import matplotlib.ticker as mtick
-
+from superqt import QRangeSlider
+import matplotlib.colors as mcolors
+import matplotlib.cm as cm
+import numpy as np
 
 class App(QMainWindow):
     def __init__(self):
@@ -89,33 +93,75 @@ class App(QMainWindow):
         filter_row2.addWidget(self.speedlimit_filter)
 
         # --- Time Slider ---
+        ## Range Slider
+        ### Left time label
         time_layout = QHBoxLayout()
-        time_layout.addWidget(QLabel("Time of Day:"))
-        self.time_slider = QSlider(Qt.Orientation.Horizontal)
-        self.time_slider.setMinimum(-1)  # -1 = Any
-        self.time_slider.setMaximum(23)  # Hours 0–23
-        self.time_slider.setValue(-1)  # Default: Any
+        time_slider_title = QLabel('Time:')
+        time_slider_title.setFixedWidth(40)
+        time_layout.addWidget(time_slider_title)
+
+        ### Actual Slider
+        self.time_slider = QRangeSlider(Qt.Orientation.Horizontal)
+        self.time_slider.setMinimum(0)
+        self.time_slider.setMaximum(23)
+        self.time_slider.setValue((0, 23))
         self.time_slider.setTickInterval(1)
         self.time_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.time_slider.valueChanged.connect(self.update_plot)
         time_layout.addWidget(self.time_slider)
+
+        ### Right selection text
         self.time_label = QLabel("Any")
+        self.time_label.setFixedWidth(60)
         time_layout.addWidget(self.time_label)
 
+        # Single Slider
+        # self.time_slider = QSlider(Qt.Orientation.Horizontal)
+        # self.time_slider.setMinimum(-1)  # -1 = Any
+        # self.time_slider.setMaximum(23)  # Hours 0–23
+        # self.time_slider.setValue(-1)  # Default: Any
+        # self.time_slider.setTickInterval(1)
+        # self.time_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        # self.time_slider.valueChanged.connect(self.update_plot)
+        # time_layout.addWidget(self.time_slider)
+        # self.time_label = QLabel("Any")
+        # time_layout.addWidget(self.time_label)
+
         # --- Month Slider ---
+        ### left title
         month_layout = QHBoxLayout()
-        month_layout.addWidget(QLabel("Month:"))
-        self.month_slider = QSlider(Qt.Orientation.Horizontal)
-        self.month_slider.setMinimum(0)  # -1 = Any
-        self.month_slider.setMaximum(12)  # Months: 1-12
-        self.month_slider.setValue(0)  # Default: Any
+        month_slider_title = QLabel('Month:')
+        month_slider_title.setFixedWidth(40)
+        month_layout.addWidget(month_slider_title)
+
+        ### month slider
+        self.month_slider = QRangeSlider(Qt.Orientation.Horizontal)
+        self.month_slider.setMinimum(1)
+        self.month_slider.setMaximum(12)
+        self.month_slider.setValue((1,12))
         self.month_slider.setTickInterval(1)
+
         self.month_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.month_slider.valueChanged.connect(self.update_plot)
         month_layout.addWidget(self.month_slider)
+
+        ### right selection text
         self.month_label = QLabel("Any")
         self.month_label.setFixedWidth(60)
         month_layout.addWidget(self.month_label)
+
+        # Normal Slider
+        # self.month_slider = QSlider(Qt.Orientation.Horizontal)
+        # self.month_slider.setMinimum(0)  # -1 = Any
+        # self.month_slider.setMaximum(12)  # Months: 1-12
+        # self.month_slider.setValue(0)  # Default: Any
+        # self.month_slider.setTickInterval(1)
+        # self.month_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        # self.month_slider.valueChanged.connect(self.update_plot)
+        # month_layout.addWidget(self.month_slider)
+        # self.month_label = QLabel("Any")
+        # self.month_label.setFixedWidth(60)
+        # month_layout.addWidget(self.month_label)
 
         # --- Matplotlib figure Histogram ---
         self.figure_hist = Figure(figsize=(12, 8))
@@ -181,16 +227,20 @@ class App(QMainWindow):
 
         # Apply hour filter
         hour_choice = self.time_slider.value()
-        if hour_choice == -1:
+        time_choice_text = str(hour_choice[0]) + ' - ' + str(hour_choice[1])
+        if hour_choice[0] == -1:
             self.time_label.setText("Any")
         else:
-            self.time_label.setText(str(hour_choice))
-            df_filtered = filter_data(df_filtered, "CrashHour", hour_choice)
+            self.time_label.setText(time_choice_text)
+            df_filtered = df_filtered[df_filtered["CrashHour"] >= hour_choice[0]]
+            df_filtered = df_filtered[df_filtered["CrashHour"] <= hour_choice[1]]
 
         # Apply month filter
-        month_choice = self.months[self.month_slider.value()]
-        self.month_label.setText(month_choice)
-        df_filtered = filter_data(df_filtered, "CrashMonth", month_choice)
+        month_choice = self.month_slider.value()
+        month_choice_text = self.months[month_choice[0]][:3] + "-" + self.months[month_choice[1]][:3]
+        self.month_label.setText(month_choice_text)
+        month_choice_list = self.months[month_choice[0]:month_choice[1]+1]
+        df_filtered = df_filtered[df_filtered["CrashMonth"].isin(month_choice_list)]
 
         # -0---------------- Plot heatmap ---------------------
         
@@ -218,14 +268,28 @@ class App(QMainWindow):
             ordered_counts = [0 for _ in self.injury_order]
         else:
             ordered_counts = [100 * counts.get(cat, 0) / num_filtered for cat in self.injury_order]
-        ax.bar(self.injury_order, ordered_counts)
+
+        #Red Color Map
+        cmap = self.adjusted_colormap(cm.YlOrRd, 0.3)
+        norm = mcolors.Normalize(vmin=0, vmax=len(self.injury_order) - 1)
+        colors = [cmap(norm(i)) for i in range(len(self.injury_order))]
+
+        ax.bar(self.injury_order, ordered_counts, color=colors)
+
         ax.set_xticks(range(len(self.injury_order)))
         ax.set_xticklabels([self.pretty_injury_labels[label] for label in self.injury_order], rotation=25, ha="right", fontsize=8)
 
-        ax.set_title(f"Bike Injury By Severity")
+        histogram_title = f"Bike Injury By Severity During {month_choice_text}"
+        if time_choice_text != "0 - 23":
+            histogram_title = f"Bike Injury By Severity During {month_choice_text} \n At Time {time_choice_text}"
+        ax.set_title(histogram_title)
         ax.set_xlabel("Injury Severity")
         ax.set_ylabel("Percentage of Accidents")
         ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.0f%%'))
+
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.yaxis.grid(True, linestyle='--', linewidth=0.7, color='white', alpha=0.7)
 
         # shift hist up a to avoid cutting off category labels
         self.figure_hist.subplots_adjust(left=0.2, bottom=0.2)
@@ -283,6 +347,13 @@ class App(QMainWindow):
         cat = mode_series.iloc[0]
         percentage = (df[column] == cat).sum() * 100 / len(df)
         return f"{cat} ({percentage:.1f}%)"
+
+    def adjusted_colormap(self, cmap, minval=0, maxval=1.0, n=100):
+        new_cmap = mcolors.LinearSegmentedColormap.from_list(
+            f'trunc({cmap.name},{minval:.2f},{maxval:.2f})',
+            cmap(np.linspace(minval, maxval, n))
+        )
+        return new_cmap
 
 #TESTING
 if __name__ == "__main__":
