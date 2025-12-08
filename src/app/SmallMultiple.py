@@ -21,11 +21,10 @@ class SmallMultiplesApp(QMainWindow):
         self.setGeometry(100, 100, 1200, 800)
 
         self.df = load_bike_crash_data()
-        self.cetegories = ['LightCond', 'TraffCntrl', 'CrashGrp']
+        self.cetegories = ['LightCond', 'SpeedLimit', 'BikeAlcFlg', "BikeSex", "RuralUrban"]
         self.injury_order = ["O: No Injury", "C: Possible Injury", "B: Suspected Minor Injury",
                              "A: Suspected Serious Injury", "K: Killed", "Unknown Injury"]
 
-        # Main widget
         self.main_widget = QWidget()
         self.setCentralWidget(self.main_widget)
         self.layout = QVBoxLayout(self.main_widget)
@@ -36,7 +35,7 @@ class SmallMultiplesApp(QMainWindow):
         self.dropdown.currentTextChanged.connect(self.update_plot)
         self.layout.addWidget(self.dropdown)
 
-        # Matplotlib Figure
+        # Graph
         self.fig, self.axs = plt.subplots(1, 1, figsize=(12, 6))
         self.canvas = FigureCanvasQTAgg(self.fig)
         self.layout.addWidget(self.canvas)
@@ -49,8 +48,11 @@ class SmallMultiplesApp(QMainWindow):
 
         #Category filtering
         categories = self.df[category].dropna().unique()
+        #I gave up on filtering lmao, we're only gonna use this once anyways I think i hope kekw
         categories = [c for c in categories if c != "Unknown"]
         categories = [c for c in categories if c != "Other"]
+        categories = [c for c in categories if c != "Missing"]
+        categories = [c for c in categories if c != "."]
         categories = [c for c in categories if c != "Dark - Unknown Lighting"]
         categories = sorted(categories)
 
