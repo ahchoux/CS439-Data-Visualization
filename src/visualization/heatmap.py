@@ -161,7 +161,7 @@ def plot_crash_hexbin(
             annot.set_visible(False)
             return
 
-        # Flip tooltip to avoid going off-screen
+        # Flip tooltip to avoid going off-screen horizontally
         midpoint = (xmin + xmax) / 2
         if cx > midpoint:
             annot.set_ha("right")
@@ -169,6 +169,15 @@ def plot_crash_hexbin(
         else:
             annot.set_ha("left")
             annot.xytext = (20, 20)
+            annot.set_position((20, 20))
+
+        # Flip tooltip to avoid going off-screen vertically
+        midpoint_y = (ymin + ymax) / 2
+        if cy > midpoint_y:
+            annot.set_va("top")
+            annot.set_position((20, -20))
+        else:
+            annot.set_va("bottom")
             annot.set_position((20, 20))
 
         text = "Crash Severity Counts:\n" + "\n".join(
