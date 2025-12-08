@@ -1,8 +1,17 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
+import matplotlib.colors as mcolors
 import pandas as pd
 import numpy as np
 import re
+import matplotlib.cm as cm
+
+def adjusted_colormap(cmap, minval=0, maxval=1.0, n=100):
+        new_cmap = mcolors.LinearSegmentedColormap.from_list(
+            f'trunc({cmap.name},{minval:.2f},{maxval:.2f})',
+            cmap(np.linspace(minval, maxval, n))
+        )
+        return new_cmap
 
 SEVERITY_ORDER = [
     "O: No Injury",
@@ -35,20 +44,6 @@ BAD_VALUES = {"nan", "NaN", "", " ", "NONE", "None", "UNKNOWN", "Missing"}
 
 
 def plot_severity_matrix(df, ax=None, row_var="RdSurface", col_var="SpeedLimit"):
-    """
-    Draws a matrix of bar charts showing injury severity counts
-    for each combination of road surface and speed limit category.
-    
-    All cells in the same row share the same y-axis scale, so that
-    the same count appears at the same height across all cells in that row.
-
-    This version:
-    - Enforces a strict whitelist of valid RdSurface values
-    - Removes all NaN/invalid/garbage categories
-    - Guarantees no unlabeled rows appear
-    - Uses counts (not proportions) with row-wise normalized scales
-    """
-
     if ax is None:
         fig, ax = plt.subplots()
     else:
@@ -179,19 +174,27 @@ def plot_severity_matrix(df, ax=None, row_var="RdSurface", col_var="SpeedLimit")
 
             x = np.arange(len(SEVERITY_ORDER))
 
+            cmap = adjusted_colormap(cm.YlOrRd, 0.3)
+            norm = mcolors.Normalize(vmin=0, vmax=len(SEVERITY_ORDER) - 1)
+            colors = [cmap(norm(i)) for i in range(len(SEVERITY_ORDER))]
+
             cell_ax.bar(
                 x,
                 count_values,
-                color=[SEVERITY_COLORS[s] for s in SEVERITY_ORDER],
+                color=colors,
                 width=0.7
             )
 
-            cell_ax.set_xticks(x)
-            cell_ax.set_xticklabels(
-                ["No", "Poss", "Minor", "Serious", "Kill"],
-                fontsize=6,
-                rotation=45
-            )
+            if i == nrows - 1:
+                cell_ax.set_xticks(x)
+                cell_ax.set_xticklabels(
+                    ["No", "Poss", "Minor", "Serious", "Kill"],
+                    fontsize=6,
+                    rotation=45
+                )
+            else:
+                cell_ax.set_xticks([])
+                cell_ax.set_xticklabels([])
 
     for i, surface in enumerate(row_cats):
         leftmost_ax = axs[i][0]
@@ -201,26 +204,10 @@ def plot_severity_matrix(df, ax=None, row_var="RdSurface", col_var="SpeedLimit")
         else:
             leftmost_ax.set_ylabel(f"{surface}\nCount", fontsize=10,
                                    rotation=0, labelpad=50)
-
-    legend_labels = {
-        "O: No Injury": "No Injury",
-        "C: Possible Injury": "Possible Injury",
-        "B: Suspected Minor Injury": "Minor Injury",
-        "A: Suspected Serious Injury": "Serious Injury",
-        "K: Killed": "Killed"
-    }
-    legend_elements = [
-        Patch(facecolor=SEVERITY_COLORS[sev], label=legend_labels[sev])
-        for sev in SEVERITY_ORDER
-    ]
-    fig.legend(handles=legend_elements, loc='center left', 
-              bbox_to_anchor=(1.0, 0.5), fontsize=9, frameon=True)
-
     fig.suptitle(
         "Injury Severity Matrix by Road Surface × Speed Limit",
         fontsize=16,
         y=0.98
     )
-    fig.tight_layout(rect=[0, 0, 0.95, 0.96])
 
     return fig
