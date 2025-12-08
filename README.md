@@ -95,6 +95,11 @@ pip install -r requirements.txt
    python -m scripts.main  # Windows 
    python3 -m scripts.main # Mac/Linux
    ```
+3. Run animated crashes
+   ```
+   python scripts/animate_crashes.py   # Windows 
+   python3 scripts/animate_crashes.py  # Mac/Linux
+   ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Usage
