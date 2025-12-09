@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import transforms
 from matplotlib.animation import FuncAnimation
+import matplotlib.cm as cm
 import contextily as ctx
 import geopandas as gpd
 import numpy as np
@@ -15,8 +16,12 @@ _gdf_all = prepare_crash_geodata(_df_all)
 FULL_BOUNDS = _gdf_all.total_bounds
 
 
-def _get_basemap_source(style: str):
+def _get_basemap_source(style: str, dark_mode: bool = False):
     """Small helper to choose ArcGIS basemap."""
+    # If dark mode is enabled, use dark basemap
+    if dark_mode:
+        return ctx.providers.CartoDB.DarkMatter
+    
     style = style.lower()
     if style in ("street", "streets"):
         return ctx.providers.Esri.WorldStreetMap
@@ -31,13 +36,14 @@ def plot_crash_points(
     gdf_web: gpd.GeoDataFrame,
     basemap_style: str = "street",
     figsize=(8, 8),
+    dark_mode: bool = False,
 ):
     """Plot crash points on an Esri basemap."""
     fig, ax = plt.subplots(figsize=figsize)
 
     gdf_web.plot(ax=ax, markersize=5, alpha=0.5)
 
-    ctx.add_basemap(ax, source=_get_basemap_source(basemap_style))
+    ctx.add_basemap(ax, source=_get_basemap_source(basemap_style, dark_mode=dark_mode))
 
     ax.set_frame_on(False)
     ax.get_xaxis().set_visible(False)
@@ -52,6 +58,7 @@ def plot_crash_hexbin(
     basemap_style: str = "gray",
     gridsize: int = 40,
     ax=None,
+    dark_mode: bool = False,
 ):
     """Plot a hexbin density heatmap of crashes on an Esri basemap."""
     import numpy as np
@@ -70,14 +77,26 @@ def plot_crash_hexbin(
         xmin, ymin, xmax, ymax = FULL_BOUNDS
         ax.set_xlim(xmin, xmax)
         ax.set_ylim(ymin, ymax)
-        ctx.add_basemap(ax, source=_get_basemap_source(basemap_style))
+        ctx.add_basemap(ax, source=_get_basemap_source(basemap_style, dark_mode=dark_mode))
 
         for t in list(ax.texts):
             t.remove()
 
+        # apply dark mode styling if enabled
+        # always reset colors to ensure proper switching between modes
+        if dark_mode:
+            fig.patch.set_facecolor('#1a1a1a')
+            ax.set_facecolor('#1a1a1a')
+            text_color = '#ff6b6b'  # Lighter red for dark background
+        else:
+            # reset to light mode defaults
+            fig.patch.set_facecolor('white')
+            ax.set_facecolor('white')
+            text_color = "red"
+
         ax.text(
             0.5, 0.5, "No data for selected filters",
-            ha="center", va="center", fontsize=12, color="red",
+            ha="center", va="center", fontsize=12, color=text_color,
             transform=ax.transAxes,
         )
         ax.set_frame_on(False)
@@ -87,6 +106,7 @@ def plot_crash_hexbin(
 
     xmin, ymin, xmax, ymax = FULL_BOUNDS
 
+    hexbin_cmap = cm.plasma
     # Plot hexbin
     hb = ax.hexbin(
         x,
@@ -95,6 +115,7 @@ def plot_crash_hexbin(
         mincnt=1,
         alpha=0.4,
         extent=(xmin, xmax, ymin, ymax),
+        cmap=hexbin_cmap,
     )
 
     ax.set_xlim(xmin, xmax)
@@ -102,7 +123,7 @@ def plot_crash_hexbin(
     ax.set_aspect("equal")
 
     # Add map background
-    ctx.add_basemap(ax, source=_get_basemap_source(basemap_style))
+    ctx.add_basemap(ax, source=_get_basemap_source(basemap_style, dark_mode=dark_mode))
 
     # remove contextily text
     for t in list(ax.texts):
@@ -113,7 +134,22 @@ def plot_crash_hexbin(
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
-    ax.set_title("Bike Crash Density – Chapel Hill", fontsize=14)
+    # always reset colors for switching between modes
+    if dark_mode:
+        fig.patch.set_facecolor('#1a1a1a')  # Dark background for figure
+        ax.set_facecolor('#1a1a1a')  # Dark background for axes
+        title_color = 'white'
+        label_color = 'white'
+        tick_color = 'white'
+    else:
+        # reset to light mode defaults
+        fig.patch.set_facecolor('white')
+        ax.set_facecolor('white')
+        title_color = 'black'
+        label_color = 'black'
+        tick_color = 'black'
+
+    ax.set_title("Bike Crash Density – Chapel Hill", fontsize=14, color=title_color)
     cb = fig.colorbar(
         hb,
         ax=ax,
@@ -122,6 +158,10 @@ def plot_crash_hexbin(
         pad=0.05,
         shrink=0.95
     )
+    cb.set_label("Crash Count", color=label_color)
+    cb.ax.xaxis.set_tick_params(color=tick_color)
+    cb.ax.xaxis.label.set_color(label_color)
+    plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color=tick_color)
 
     fig.subplots_adjust(left=0.005, right=0.995, top=1, bottom=0.1)
 
@@ -139,14 +179,18 @@ def plot_crash_hexbin(
     for p_idx, bin_idx in enumerate(assigned_bins):
         sev_per_hex[bin_idx][codes[p_idx]] += 1
 
-    annot = ax.annotate(
+        # Set tooltip background color based on dark mode
+        tooltip_bg = '#2a2a2a' if dark_mode else 'w'
+        tooltip_text_color = 'white' if dark_mode else 'black'
+        annot = ax.annotate(
         "",
         xy=(0, 0),
         xytext=(20, 20),
         textcoords="offset points",
-        bbox=dict(boxstyle="round", fc="w"),
-        arrowprops=dict(arrowstyle="->"),
+        bbox=dict(boxstyle="round", fc=tooltip_bg, ec='gray' if dark_mode else 'black'),
+        arrowprops=dict(arrowstyle="->", color='white' if dark_mode else 'black'),
         zorder=50,
+        color=tooltip_text_color,
     )
     annot.set_visible(False)
 
@@ -367,4 +411,3 @@ def animate_crash_density_over_time(
         print("Animation saved!")
     
     return fig, anim
-
