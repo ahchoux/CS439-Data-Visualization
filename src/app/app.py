@@ -212,6 +212,9 @@ class App(QMainWindow):
         # Apply LightCond filter
         lightcond_choice = self.lightcond_filter.currentText()
         df_filtered = filter_data(df_filtered, "LightCond", lightcond_choice)
+        
+        # Check if light condition contains "dark" (case-insensitive)
+        is_dark_mode = "dark" in lightcond_choice.lower() if lightcond_choice != "Any" else False
 
         # Apply BikePos filter
         bikepos_choice = self.bikepos_filter.currentText()
@@ -249,7 +252,7 @@ class App(QMainWindow):
         ax = self.figure_heatmap.add_subplot(1, 1, 1)
         
         gdf_web = prepare_crash_geodata(df_filtered)
-        plot_crash_hexbin(gdf_web, basemap_style="street", gridsize=40, ax=ax)
+        plot_crash_hexbin(gdf_web, basemap_style="street", gridsize=40, ax=ax, dark_mode=is_dark_mode)
         self.canvas_heatmap.draw()
         
         # ----------------- Plot histogram ---------------------
@@ -258,6 +261,23 @@ class App(QMainWindow):
         self.figure_hist.clear()
         ax = self.figure_hist.add_subplot(1, 1, 1)
 
+        # Apply dark mode styling to histogram
+        # Always explicitly reset colors to ensure proper switching between modes
+        if is_dark_mode:
+            self.figure_hist.patch.set_facecolor('#1a1a1a')
+            ax.set_facecolor('#1a1a1a')
+            text_color = 'white'
+            label_color = 'white'
+            tick_color = 'white'
+            grid_color = '#333333'
+        else:
+            # Explicitly reset to light mode defaults
+            self.figure_hist.patch.set_facecolor('white')
+            ax.set_facecolor('white')
+            text_color = 'black'
+            label_color = 'black'
+            tick_color = 'black'
+            grid_color = '#cccccc'
 
         num_filtered = len(df_filtered)
         counts = df_filtered["BikeInjury"].value_counts()
@@ -277,19 +297,30 @@ class App(QMainWindow):
         ax.bar(self.injury_order, ordered_counts, color=colors)
 
         ax.set_xticks(range(len(self.injury_order)))
-        ax.set_xticklabels([self.pretty_injury_labels[label] for label in self.injury_order], rotation=25, ha="right", fontsize=8)
+        ax.set_xticklabels([self.pretty_injury_labels[label] for label in self.injury_order], rotation=25, ha="right", fontsize=8, color=text_color)
 
         histogram_title = f"Bike Injury By Severity During {month_choice_text}"
         if time_choice_text != "0 - 23":
             histogram_title = f"Bike Injury By Severity During {month_choice_text} \n At Time {time_choice_text}"
-        ax.set_title(histogram_title)
-        ax.set_xlabel("Injury Severity")
-        ax.set_ylabel("Percentage of Accidents")
+        ax.set_title(histogram_title, color=text_color)
+        ax.set_xlabel("Injury Severity", color=label_color)
+        ax.set_ylabel("Percentage of Accidents", color=label_color)
         ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.0f%%'))
+        
+        # Set tick colors
+        ax.tick_params(colors=tick_color)
+        ax.spines['bottom'].set_color(tick_color)
+        ax.spines['top'].set_color(tick_color)
+        ax.spines['right'].set_color(tick_color)
+        ax.spines['left'].set_color(tick_color)
+        
+        # Set grid color
+        ax.grid(True, alpha=0.3, color=grid_color)
 
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
-        ax.yaxis.grid(True, linestyle='--', linewidth=0.7, color='white', alpha=0.7)
+        # Use appropriate grid color based on dark mode
+        ax.yaxis.grid(True, linestyle='--', linewidth=0.7, color=grid_color, alpha=0.7)
 
         # shift hist up a to avoid cutting off category labels
         self.figure_hist.subplots_adjust(left=0.2, bottom=0.2)
