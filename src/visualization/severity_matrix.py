@@ -69,7 +69,6 @@ def plot_severity_matrix(df, ax=None, row_var="RdSurface", col_var="SpeedLimit")
     row_cats.append("Overall")
 
     def sort_speed_key(value):
-        """Sort key for speed limits: numeric values first (ascending), then non-numeric"""
         value_str = str(value).strip().lower()
         
         if value_str in ["unknown", "unk", "n/a", "na", "none", ""]:
@@ -199,10 +198,10 @@ def plot_severity_matrix(df, ax=None, row_var="RdSurface", col_var="SpeedLimit")
     for i, surface in enumerate(row_cats):
         leftmost_ax = axs[i][0]
         if surface == "Overall":
-            leftmost_ax.set_ylabel("Overall\nCount", fontsize=10,
+            leftmost_ax.set_ylabel("Overall", fontsize=10,
                                    rotation=0, labelpad=50)
         else:
-            leftmost_ax.set_ylabel(f"{surface}\nCount", fontsize=10,
+            leftmost_ax.set_ylabel(f"{surface}", fontsize=10,
                                    rotation=0, labelpad=50)
     fig.suptitle(
         "Injury Severity Matrix by Road Surface × Speed Limit",
