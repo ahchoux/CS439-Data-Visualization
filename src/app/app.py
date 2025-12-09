@@ -210,10 +210,15 @@ class App(QMainWindow):
         df_filtered = filter_data(df_filtered, "HitRun", hitrun_choice)
 
         # Apply LightCond filter
+        self.prev_lightcond_choice = getattr(self, 'prev_lightcond_choice', None)
         lightcond_choice = self.lightcond_filter.currentText()
-        df_filtered = filter_data(df_filtered, "LightCond", lightcond_choice)
+        dark_mode_updated = False
+        if lightcond_choice != self.prev_lightcond_choice:
+            df_filtered = filter_data(df_filtered, "LightCond", lightcond_choice)
+            self.prev_lightcond_choice = lightcond_choice
+            dark_mode_updated = True
         
-        # Check if light condition contains "dark" (case-insensitive)
+        # Check if light condition contains "dark" (case-insensitive) every 
         is_dark_mode = "dark" in lightcond_choice.lower() if lightcond_choice != "Any" else False
 
         # Apply BikePos filter
@@ -252,7 +257,7 @@ class App(QMainWindow):
         ax = self.figure_heatmap.add_subplot(1, 1, 1)
         
         gdf_web = prepare_crash_geodata(df_filtered)
-        plot_crash_hexbin(gdf_web, basemap_style="street", gridsize=40, ax=ax, dark_mode=is_dark_mode)
+        plot_crash_hexbin(gdf_web, basemap_style="street", gridsize=40, ax=ax, dark_mode=is_dark_mode, dark_mode_updated=dark_mode_updated)
         self.canvas_heatmap.draw()
         
         # ----------------- Plot histogram ---------------------
@@ -269,7 +274,7 @@ class App(QMainWindow):
             text_color = 'white'
             label_color = 'white'
             tick_color = 'white'
-            grid_color = '#333333'
+            grid_color = "#797979"
         else:
             # Explicitly reset to light mode defaults
             self.figure_hist.patch.set_facecolor('white')
