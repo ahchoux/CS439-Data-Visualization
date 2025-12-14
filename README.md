@@ -29,9 +29,8 @@
 1. [About The Project](#about-the-project)
    - [Built With](#built-with)
 2. [Getting Started](#getting-started)
-   - [Prerequisites](#prerequisites)
    - [Installation](#installation)
-3. [Usage](#usage)
+   - [Usage](#usage)
 4. [Roadmap](#roadmap)
 5. [Contributing](#contributing)
 6. [License](#license)
@@ -42,7 +41,16 @@
 
 ## About The Project
 
-<img width="2790" height="1742" alt="image" src="https://github.com/user-attachments/assets/976f7490-b482-41ec-a195-7d2d36fd0883" />
+### Interactive App:
+<img width="1391" height="838" alt="image" src="https://github.com/user-attachments/assets/0ce9206a-bc5d-409f-be58-437a0533054f" />
+
+### Interactive Line Chart:
+<img width="1610" height="849" alt="image" src="https://github.com/user-attachments/assets/dcada6d2-f35a-49aa-ad60-a8a2838e2d0c" />
+
+### Severity Matrix:
+
+<img width="1379" height="633" alt="image" src="https://github.com/user-attachments/assets/5e036bc6-da94-4479-b662-d3f82c446121" />
+
 
 ### Overview  
 Bike safety is a major concern in many urban areas where cars and bicycles share the road. Our project visualizes **bicycle crash data from 2007–2018 in Chapel Hill, North Carolina**, with the goal of understanding how environmental, demographic, and behavioral factors contribute to crash severity and frequency.
@@ -75,28 +83,34 @@ Users can filter features such as "Time of Day", "Alcohol Involvement", "Traffic
 
 ## Getting Started
 
-### Prerequisites
+### Installation
 
 Make sure you have **Python 3.9+** installed.
 
-Install dependencies:
+1. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-### Installation
 
-1. **Clone the repository**
+2. **Clone the repository**
    ```bash
    git clone https://github.com/ahchoux/CS439-Data-Visualization.git
    ```
-2. Run the different visualizations
+
+### Usage
+
+Run the different visualizations
 
    - Interactive app with histogram and heatmap
       ```
       python -m scripts.main  # Windows 
       python3 -m scripts.main # Mac/Linux
       ```
+        * Launch the app to explore crash data interactively.
+        * Use dropdown menus and sliders to filter by available attributes.
+        * Hover over map points or bars for detailed crash information.
+          
    - Interactive line chart
       ```
       python -m src.app.linechartinteractive   # Windows 
@@ -117,20 +131,6 @@ pip install -r requirements.txt
       python -m src.app.SmallMultiple   # Windows 
       python3 -m src.app.SmallMultiple  # Mac/Linux
       ```
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-## Usage
-
-* Launch the app to explore crash data interactively.
-* Use dropdown menus and sliders to filter by available attributes.
-* Hover over map points or bars for detailed crash information.
-
-### Example use cases
-
-* Identify what traffic accident scenarios are the most likely under different conditions.
-* Examine how alcohol use and lighting conditions affect injury severity.
-* Compare crash frequency by time of day or year.
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Roadmap
