@@ -90,16 +90,33 @@ pip install -r requirements.txt
    ```bash
    git clone https://github.com/ahchoux/CS439-Data-Visualization.git
    ```
-2. Run the visualizations
-   ```
-   python -m scripts.main  # Windows 
-   python3 -m scripts.main # Mac/Linux
-   ```
-3. Run animated crashes
-   ```
-   python scripts/animate_crashes.py   # Windows 
-   python3 scripts/animate_crashes.py  # Mac/Linux
-   ```
+2. Run the different visualizations
+
+   - Interactive app with histogram and heatmap
+      ```
+      python -m scripts.main  # Windows 
+      python3 -m scripts.main # Mac/Linux
+      ```
+   - Interactive line chart
+      ```
+      python -m src.app.linechartinteractive   # Windows 
+      python3 -m src.app.linechartinteractive  # Mac/Linux
+      ```
+   - Animated heatmap over time
+      ```
+      python -m scripts.animate_crashes   # Windows 
+      python3 -m scripts.animate_crashes  # Mac/Linux
+      ```
+   - Severity matrix
+      ```
+      python -m scripts.severity   # Windows 
+      python3 -m scripts.severity  # Mac/Linux
+      ```
+   - Small multiples
+      ```
+      python -m src.app.SmallMultiple   # Windows 
+      python3 -m src.app.SmallMultiple  # Mac/Linux
+      ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Usage
